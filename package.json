@@ -1,0 +1,38 @@
+{
+  "name": "personal-ai-inbox",
+  "version": "1.0.0",
+  "description": "Private text capture from Telegram to a durable local queue and Notion",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "build": "tsc",
+    "test": "npm run build && DOTENV_CONFIG_PATH=/dev/null node --test dist/tests/*.test.js",
+    "start": "node dist/src/index.js",
+    "dev": "tsx src/index.ts",
+    "demo": "tsx src/demo.ts",
+    "setup:notion": "tsx src/notion/setup.ts",
+    "status": "tsx src/cli.ts status",
+    "retry": "tsx src/cli.ts retry",
+    "recover-lock": "tsx src/cli.ts recover-lock",
+    "supervise": "overmind start -D -N -t 45 -r inbox -f Procfile",
+    "supervise:status": "overmind status",
+    "supervise:stop": "overmind quit",
+    "test:supervisor": "npm run build && DOTENV_CONFIG_PATH=/dev/null node --test tests/supervisor.test.mjs"
+  },
+  "keywords": [],
+  "type": "module",
+  "dependencies": {
+    "@notionhq/client": "5.27.1",
+    "dotenv": "18.0.8",
+    "grammy": "1.46.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.5",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  }
+}
