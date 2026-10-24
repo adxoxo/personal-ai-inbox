@@ -1,0 +1,9 @@
+[Unit]
+Description=Ensure the personal Inbox supervisor runs inside Work2
+
+[Service]
+Type=oneshot
+UMask=0077
+ExecCondition=/usr/bin/podman exec --user 1000:1000 job-work2 /usr/bin/true
+ExecStart=/usr/bin/podman exec --user 1000:1000 --workdir /home/node/projects/personal-projects/personal-ai-inbox job-work2 /bin/sh scripts/start-at-boot.sh
+TimeoutStartSec=45

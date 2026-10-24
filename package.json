@@ -16,7 +16,9 @@
     "supervise": "overmind start -D -N -t 45 -r inbox -f Procfile",
     "supervise:status": "overmind status",
     "supervise:stop": "overmind quit",
-    "test:supervisor": "npm run build && DOTENV_CONFIG_PATH=/dev/null node --test tests/supervisor.test.mjs"
+    "startup": "sh scripts/start-at-boot.sh",
+    "test:supervisor": "npm run build && DOTENV_CONFIG_PATH=/dev/null node --test tests/supervisor.test.mjs",
+    "test:startup": "npm run build && DOTENV_CONFIG_PATH=/dev/null node --test tests/startup.test.mjs"
   },
   "keywords": [],
   "type": "module",

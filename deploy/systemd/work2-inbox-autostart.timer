@@ -1,0 +1,11 @@
+[Unit]
+Description=Restore the personal Inbox supervisor after Work2 restarts
+
+[Timer]
+OnStartupSec=10s
+OnUnitInactiveSec=30s
+AccuracySec=1s
+Unit=work2-inbox-autostart.service
+
+[Install]
+WantedBy=timers.target

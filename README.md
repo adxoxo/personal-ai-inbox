@@ -152,7 +152,7 @@ npm start
 Startup verifies the Notion destination before Telegram intake begins.
 Keep this foreground process and its host available.
 Press Ctrl+C for a normal shutdown.
-No system service, public endpoint, cloud deployment, or recurring schedule is installed.
+No public endpoint or cloud deployment is required. Optional host startup units appear below.
 
 ### Local crash recovery
 
@@ -172,9 +172,42 @@ An active or unverifiable lock blocks startup. Captured data remains intact.
 Use `supervise:stop` before an offline status command or backup.
 Inspect private runtime output with `overmind echo`. Never copy captured content into shared reports.
 
-This daemon survives an individual worker crash. It does not start after a host or container restart.
-Run `npm run supervise` after such a restart. Do not run the foreground bot beside the supervisor.
+This daemon survives an individual worker crash. Automatic container recovery requires the host timer below.
+Use `npm run startup` for guarded startup or recovery. Do not run the foreground bot beside the supervisor.
 Run `npm run test:supervisor` for isolated crash and journal-retention proof.
+
+### Container startup on the Ubuntu host
+
+The host timer checks Work2 every 30 seconds. It skips a stopped container.
+When Work2 runs, it ensures the existing Overmind supervisor runs too.
+The starter serializes concurrent requests and retains the existing journal and worker lock guard.
+It preserves live sockets and moves only a verified refused socket aside.
+
+From this repository on the Ubuntu host, install and activate the two user units:
+
+~~~bash
+mkdir -p ~/.config/systemd/user
+cp deploy/systemd/work2-inbox-autostart.service deploy/systemd/work2-inbox-autostart.timer ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now work2-inbox-autostart.timer
+systemctl --user start work2-inbox-autostart.service
+~~~
+
+The units target the existing `job-work2` container and this app's `/home/node/projects/` checkout.
+The user service manager must run. The timer does not start Work2 itself or enable host linger.
+Host reboot recovery still depends on the existing container and user-session setup.
+
+For an intentional stop, stop the host timer before the supervisor:
+
+~~~bash
+systemctl --user disable --now work2-inbox-autostart.timer
+podman exec --user 1000:1000 --workdir /home/node/projects/personal-projects/personal-ai-inbox job-work2 npm run supervise:stop
+~~~
+
+Without that timer stop, the next timer check restores the supervisor.
+To remove this integration, disable its timer, remove only its two unit files, and reload the user service manager.
+Use `npm run test:startup` for isolated stale-socket, concurrent-start, live-socket, and data-retention checks.
+Host timer activation and an actual container-restart-to-capture check require separate live evidence.
 
 Send a private text message, photo, image file, or public link to the bot.
 The first reply confirms durable local receipt.
